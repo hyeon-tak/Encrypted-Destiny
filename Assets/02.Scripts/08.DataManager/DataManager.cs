@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
+using System;
 
 
 public class DataManager : MonoBehaviour
@@ -63,30 +64,23 @@ public class DataManager : MonoBehaviour
             transformDataList.Add(new TransformData(obj.name, position, rotation.eulerAngles, isActive));
         }
 
-        string eventJson = JsonUtility.ToJson(objectStates);
-        string eventLogFilePath = Application.persistentDataPath + "/EventLog.json";
-        File.WriteAllText(eventLogFilePath, eventJson);
-        Debug.Log("이벤트 로그 저장.");
-
         string json = JsonUtility.ToJson(new TransformDataList(transformDataList));
-
-        
         string filePath = Application.persistentDataPath + "/GameData.json";
         File.WriteAllText(filePath, json);
-
         Debug.Log(" 저장됨 " + filePath);
+
+        SaveEventLog();
+
     }
 
     private void LoadGameData() // 데이터 로드
     {
         string filePath = Application.persistentDataPath + "/GameData.json";
-
         
         if (File.Exists(filePath))
         {
             
             string json = File.ReadAllText(filePath);
-
 
             TransformDataList data = JsonUtility.FromJson<TransformDataList>(json);
 
@@ -103,23 +97,35 @@ public class DataManager : MonoBehaviour
             }
 
             Debug.Log(" 불러옴 " + filePath);
+            LoadEventLog();
         }
         else
         {
             Debug.Log(" 저장된 데이터 없음");
         }
 
+    }
+
+    private void SaveEventLog()
+    {
+        string eventJson = JsonUtility.ToJson(objectStates);
+        string eventLogFilePath = Application.persistentDataPath + "/EventLog.json";
+        File.WriteAllText(eventLogFilePath, eventJson);
+        Debug.Log("이벤트 로그 저장 완료: " + eventLogFilePath);
+    }
+
+    private void LoadEventLog()
+    {
         string eventLogFilePath = Application.persistentDataPath + "/EventLog.json";
         if (File.Exists(eventLogFilePath))
         {
             string eventJson = File.ReadAllText(eventLogFilePath);
             objectStates = JsonUtility.FromJson<List<ObjectState>>(eventJson);
 
-            
             ReplayEvents();
         }
-
     }
+
     private void ReplayEvents()
     {
         foreach (ObjectState state in objectStates)
@@ -155,7 +161,6 @@ public class TransformData // 저장할 게임오브젝트 정보 Position, Rota
 public class TransformDataList // 리스트로 만들어서 저장
 {
     public List<TransformData> transformDataList;
-
     public TransformDataList(List<TransformData> transformDataList)
     {
         this.transformDataList = transformDataList;
