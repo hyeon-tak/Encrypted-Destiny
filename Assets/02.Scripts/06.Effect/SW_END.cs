@@ -11,6 +11,7 @@ public class SW_END : MonoBehaviour
     public TextMeshProUGUI ClickText;
     public GameObject player; // 플레이어 게임 오브젝트
     public GameObject promptText;
+    public GameObject _BGM;
     public float delayBeforeTeleport;
     private float creditsSpeed;
     private float creditSpeedModifier;
@@ -23,26 +24,9 @@ public class SW_END : MonoBehaviour
 
     private void Start()
     {
-        if(height == 1440)
-        {
-            creditSpeedModifier = 200;
-            creditTime = 6500;
-        }
-        else if (height == 2160)
-        {
-            creditSpeedModifier = 300;
-            creditTime = 10000;
-        }
-        else if (height == 1080)
-        {
-            creditSpeedModifier = 150;
-            creditTime = 5000;
-        }
-        else
-        {
-            creditSpeedModifier = 150;
-            creditTime = 5000;
-        }
+        //비율에 따른 이동거리와 속도
+        creditTime = height * 4.6f;
+        creditSpeedModifier = height / 7.2f;
 
         // 스크립트 및 크레딧 텍스트 비활성화 상태로 시작
         enabled = false;
@@ -55,6 +39,7 @@ public class SW_END : MonoBehaviour
         // 오브젝트의 태그가 "Finish"이면 앤딩 시퀀스 시작
         if (gameObject.tag == "Finish")
         {
+            _BGM.SetActive(false);
             enabled = true; // 스크립트 활성화
             promptText.SetActive(false);
             StartCoroutine(EndSequence());
